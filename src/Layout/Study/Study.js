@@ -1,32 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import { readDeck } from "../../utils/api/index.js";
-import { useParams } from "react-router-dom";
-
 import Card from "./Cards";
 
-export const Study = () => {
+function Study() {
   const [deck, setDeck] = useState([]);
   const { deckId } = useParams();
 
   useEffect(() => {
-    const abortController = new AbortController();
-    const loadDeck = async () => {
-      const response = await readDeck(deckId, abortController.signal);
-      setDeck(() => response);
+    const findDeck = async () => {
+      const currDeck = await readDeck(deckId);
+      setDeck(() => currDeck);
     };
-    loadDeck();
-    return () => abortController.abort();
-  }, []);
-  //Still need breadcrums
+    findDeck();
+  }, [deckId]);
 
-  return (
-    <div>
-      <h1>Study: {deck.name}</h1>
-      <span>
+  if (Object.keys(deck).length) {
+    return (
+      <div className="col-9 mx-auto">
+        {/* navigation bar */}
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb">
+            <li className="breadcrumb-item">
+              <Link to={"/"}>Home</Link>
+            </li>
+            <li className="breadcrumb-item">
+              <Link to={`/decks/${deckId}`}>{deck.name}</Link>
+            </li>
+
+            <li className="breadcrumb-item active">Study</li>
+          </ol>
+        </nav>
+
+        {/* title */}
+        <div>
+          <h1>{deck.name}: Study</h1>
+        </div>
+
+        {/* card list */}
         <Card cards={deck.cards} />
-      </span>
-    </div>
-  );
-};
+      </div>
+    );
+  } else {
+    return (
+      <div className="spinner-border text-primary">
+        <span className="sr-only">Loading...</span>
+      </div>
+    );
+  }
+}
 
 export default Study;

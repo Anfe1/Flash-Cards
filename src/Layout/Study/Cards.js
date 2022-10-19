@@ -1,17 +1,12 @@
 import React, { useState } from "react";
-import { useParams, useHistory } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 
-export const Card = ({ cards }) => {
+const Card = ({ cards }) => {
   const [side, setSide] = useState(true);
   const [card, setCard] = useState(0);
-  const history = useHistory();
   const { deckId } = useParams();
-  // const { deckId } = useParams();
-  //when I click the button it should flip the card to back
-  //It takes in a bunch of cards and displays them one at a time
-  // const singleCard = cards.map((card) => (
-  //   <span key={card.id}>{card.front}</span>
-  // ));
+  const history = useHistory();
+
   const nextHandler = () => {
     if (card === cards.length - 1) {
       window.confirm(
@@ -19,30 +14,56 @@ export const Card = ({ cards }) => {
       )
         ? setCard(() => 0)
         : history.push("/");
+    } else {
+      setCard((card) => card + 1);
+      setSide(() => !side);
     }
   };
-  // const currentCard = cards[0];
-  const clickHandlerFlip = () => {
+
+  const flipHandler = () => {
     setSide(() => !side);
   };
 
-  return (
-    <span>
-      <div className="card">
+  if (cards.length > 2) {
+    return (
+      <div className="card w-100">
         <div className="card-body">
           <h5 className="card-title">
             Card {card + 1} of {cards.length}
           </h5>
-          <p className="card-text">
-            {side ? cards[card].front : cards[card].back}
-          </p>
-          <button onClick={clickHandlerFlip} className="btn btn-secondary">
+          <p className="body">{side ? cards[card].front : cards[card].back}</p>
+          <button onClick={flipHandler} className="btn btn-secondary mr-3">
             Flip
           </button>
+          {side ? null : (
+            <button onClick={nextHandler} className="btn btn-primary">
+              Next
+            </button>
+          )}
         </div>
       </div>
-    </span>
-  );
+    );
+  } else {
+    return (
+      <div className="row p-3 w-100">
+        <div className="card">
+          <div className="card-body">
+            <h5 className="card-title">Not enough cards.</h5>
+            <p className="card-text">
+              You need at least 3 cards to study. There are {cards.length} cards
+              in this deck.
+            </p>
+            <Link
+              to={`/decks/${deckId}/cards/new`}
+              className="btn btn-primary mx-auto"
+            >
+              Add Cards
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 };
 
 export default Card;

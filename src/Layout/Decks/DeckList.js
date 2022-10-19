@@ -1,10 +1,25 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+import { deleteDeck } from "../../utils/api/index.js";
 
-export const DeckList = ({ deck }) => {
+export const DeckList = ({ deck, updatedDecks }) => {
   const { id, name, description, cards } = deck;
   const deckLength = cards.length;
+  const history = useHistory();
 
+  const deleteHandler = async () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this deck? You will not be able to recover it."
+      )
+    ) {
+      await deleteDeck(id);
+      updatedDecks(-1);
+      history.go(0);
+    } else {
+      history.go(0);
+    }
+  };
   //creates the deck component that represent the specific id
   return (
     <div className="card w-75 mb-4">
@@ -25,7 +40,12 @@ export const DeckList = ({ deck }) => {
             Study
           </Link>
 
-          <button name="delete" value={id} className="btn btn-danger ml-auto">
+          <button
+            name="delete"
+            value={id}
+            onClick={deleteHandler}
+            className="btn btn-danger ml-auto"
+          >
             <i className="bi bi-trash"></i>
           </button>
         </div>
