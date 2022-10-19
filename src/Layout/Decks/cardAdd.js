@@ -53,7 +53,7 @@ const CardAdd = () => {
       </div>
       <CardForm
         submitForm={formSubmit}
-        changeForm={cardChangeForm}
+        cardChangeForm={cardChangeForm}
         card={card}
         deckId={deckId}
       />
